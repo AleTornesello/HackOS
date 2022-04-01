@@ -8,9 +8,9 @@
           <q-scroll-area style="height: 500px; width: 500px">
             <div class="row q-ma-sm">
               <div class="col col-3" v-for="app in ungroupedApps" :key="app.id">
-                <q-btn flat>
-                  <q-img :src="app.icon" height="40px" width="40px" />
-                  {{ app.name }}
+                <q-btn flat no-caps>
+                  <q-img :src="app.icon" height="48px" width="48px" />
+                  <div class="text-weight-light">{{ app.name }}</div>
                 </q-btn>
               </div>
             </div>
