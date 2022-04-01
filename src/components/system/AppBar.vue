@@ -5,7 +5,16 @@
 
       <q-slide-transition>
         <q-card v-show="isMenuVisible" id="apps-menu" class="bg-dark">
-          <q-scroll-area style="height: 500px; width: 500px"> </q-scroll-area>
+          <q-scroll-area style="height: 500px; width: 500px">
+            <div class="row q-ma-sm">
+              <div class="col col-3" v-for="app in ungroupedApps" :key="app.id">
+                <q-btn flat>
+                  <q-img :src="app.icon" height="40px" width="40px" />
+                  {{ app.name }}
+                </q-btn>
+              </div>
+            </div>
+          </q-scroll-area>
         </q-card>
       </q-slide-transition>
     </div>
@@ -13,17 +22,25 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { useApps } from 'src/store/app';
+import { computed, defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'AppBar',
   setup() {
+    const appsStore = useApps();
+
     const isMenuVisible = ref(false);
+    const ungroupedApps = computed(() =>
+      appsStore.getters.apps.filter((app) => !app.groupId)
+    );
+
     return {
       isMenuVisible,
       toggleMenu() {
         isMenuVisible.value = !isMenuVisible.value;
       },
+      ungroupedApps,
     };
   },
 });
@@ -33,7 +50,6 @@ export default defineComponent({
 #apps-menu {
   position: fixed !important;
   display: inline-block;
-  background: rgb(255, 255, 255);
   border-radius: 4px;
   outline: 0px;
   z-index: 6000;
