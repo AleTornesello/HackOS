@@ -12,7 +12,7 @@ export default defineComponent({
 
 <style lang="scss">
 #desktop {
-  background-image: url('assets/wallpaper.jpg');
+  background-image: url('/wallpaper.jpg');
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
