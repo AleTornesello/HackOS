@@ -26,7 +26,7 @@
                 draggable="true"
                 @dragstart="onDragStart($event, app)"
               >
-                <q-btn flat>
+                <q-btn flat no-caps>
                   <q-img :src="app.icon" height="48px" width="48px" />
                   <div class="text-weight-light">{{ app.name }}</div>
                 </q-btn>
