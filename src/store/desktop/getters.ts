@@ -5,4 +5,8 @@ export default class DesktopGetters extends Getters<DesktopState> {
   get apps() {
     return this.state.apps;
   }
+
+  get appsOnBar() {
+    return this.state.appsOnBar;
+  }
 }
