@@ -62,7 +62,7 @@
               <q-item-section> Launch {{ app.name }} </q-item-section>
             </q-item>
             <q-separator />
-            <q-item clickable>
+            <q-item clickable @click="removeAppOnBarAtIndex(index)">
               <q-item-section>Remove from applications bar</q-item-section>
             </q-item>
           </q-list>
@@ -99,7 +99,11 @@ export default defineComponent({
             appsStore.getters.apps.find((app) => app.id === appId)
           ) as Application[]
     );
-    let appOnBarIndexMenuVisible = ref<number | undefined>(undefined);
+    const appOnBarIndexMenuVisible = ref<number | undefined>(undefined);
+
+    const resetAppOnBarIndexMenuVisible = () => {
+      appOnBarIndexMenuVisible.value = undefined;
+    };
 
     return {
       isMenuVisible,
@@ -136,8 +140,10 @@ export default defineComponent({
               : appBarItemIndex;
         }
       },
-      resetAppOnBarIndexMenuVisible() {
-        appOnBarIndexMenuVisible.value = undefined;
+      resetAppOnBarIndexMenuVisible,
+      removeAppOnBarAtIndex(appBarItemIndex: number) {
+        desktopStore.mutations.removeAppFromBarAtIndex(appBarItemIndex);
+        resetAppOnBarIndexMenuVisible();
       },
     };
   },

@@ -12,4 +12,8 @@ export default class DesktopMutations extends Mutations<DesktopState> {
       this.state.appsOnBar.splice(index, 1);
     }
   }
+
+  public removeAppFromBarAtIndex(index: number) {
+    this.state.appsOnBar.splice(index, 1);
+  }
 }
