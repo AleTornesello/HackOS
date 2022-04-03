@@ -19,6 +19,8 @@
         </q-btn>
       </div>
     </div>
+
+    <windows-manger></windows-manger>
   </q-page>
 </template>
 
@@ -27,9 +29,11 @@ import { computed, defineComponent } from 'vue';
 import { useDesktop } from 'src/store/desktop';
 import { useApps } from 'src/store/app';
 import { Application } from 'src/models/app/Application';
+import WindowsManger from 'src/components/system/windows/WindowsManger.vue';
 
 export default defineComponent({
   name: 'Desktop',
+  components: { WindowsManger },
   setup() {
     const desktopStore = useDesktop();
     const appsStore = useApps();
@@ -41,7 +45,6 @@ export default defineComponent({
           appsStore.getters.apps.find((app) => app.id === appId)
         ) as Application[]
     );
-
     return {
       appsOnDesktop,
     };
@@ -69,6 +72,12 @@ export default defineComponent({
     &__app {
       width: fit-content;
     }
+  }
+
+  .process-window {
+    position: absolute;
+    min-width: 200px;
+    min-height: 150px;
   }
 }
 </style>
