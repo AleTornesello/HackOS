@@ -5,12 +5,14 @@ import VuexPersistence from 'vuex-persist';
 import appsModule from './app';
 import filesystemModule from './filesystem';
 import desktopModule from './desktop';
+import processesModule from './processes';
 
 const root = new Module({
   modules: {
     apps: appsModule,
     filesystem: filesystemModule,
     desktop: desktopModule,
+    processes: processesModule,
   },
 });
 
