@@ -46,6 +46,12 @@ export default defineComponent({
       appsOnDesktop,
     };
   },
+  created() {
+    document.oncontextmenu = function (event) {
+      if (event.preventDefault !== undefined) event.preventDefault();
+      if (event.stopPropagation !== undefined) event.stopPropagation();
+    };
+  },
 });
 </script>
 
