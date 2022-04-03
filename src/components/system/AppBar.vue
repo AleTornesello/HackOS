@@ -26,7 +26,7 @@
                 draggable="true"
                 @dragstart="onDragStart($event, app)"
               >
-                <q-btn flat no-caps>
+                <q-btn flat no-caps @click="onMenuAppClick(app)">
                   <q-img :src="app.icon" height="48px" width="48px" />
                   <div class="text-weight-light">{{ app.name }}</div>
                 </q-btn>
@@ -76,6 +76,7 @@
 import { Application } from 'src/models/app/Application';
 import { useApps } from 'src/store/app';
 import { useDesktop } from 'src/store/desktop';
+import { useProcesses } from 'src/store/processes';
 import { computed, defineComponent, ref } from 'vue';
 
 export default defineComponent({
@@ -83,6 +84,7 @@ export default defineComponent({
   setup() {
     const appsStore = useApps();
     const desktopStore = useDesktop();
+    const processesStore = useProcesses();
 
     const isMenuVisible = ref(false);
     const ungroupedApps = computed(() =>
@@ -103,6 +105,10 @@ export default defineComponent({
 
     const resetAppOnBarIndexMenuVisible = () => {
       appOnBarIndexMenuVisible.value = undefined;
+    };
+
+    const launchApp = (app: Application) => {
+      processesStore.mutations.addAppAsProcess(app);
     };
 
     return {
@@ -129,9 +135,7 @@ export default defineComponent({
           }
         }
       },
-      launchApp(app: Application) {
-        // TODO: Launch app
-      },
+      launchApp,
       onAppBarItemMouseDown(event: MouseEvent, appBarItemIndex: number) {
         if (event.button === 2) {
           appOnBarIndexMenuVisible.value =
@@ -144,6 +148,10 @@ export default defineComponent({
       removeAppOnBarAtIndex(appBarItemIndex: number) {
         desktopStore.mutations.removeAppFromBarAtIndex(appBarItemIndex);
         resetAppOnBarIndexMenuVisible();
+      },
+      onMenuAppClick(app: Application) {
+        launchApp(app);
+        isMenuVisible.value = false;
       },
     };
   },
