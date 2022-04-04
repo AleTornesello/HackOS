@@ -159,7 +159,10 @@ export default defineComponent({
               const appOnBarItem = runningAppsMap.get(process.application.id);
 
               if (appOnBarItem) {
-                appOnBarItem.runningInstancesCount++;
+                appOnBarItem.runningInstancesCount = Math.min(
+                  ++appOnBarItem.runningInstancesCount,
+                  3
+                );
                 appOnBarItem.runningInstances.push(process);
               }
             } else {
