@@ -5,7 +5,6 @@
       :key="process.id"
       :process="process"
     >
-      aaaa
     </process-window>
   </div>
 </template>
