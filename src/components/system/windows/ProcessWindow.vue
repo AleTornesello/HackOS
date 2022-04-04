@@ -1,5 +1,9 @@
 <template>
-  <q-card class="process-window shadow-2">
+  <q-card
+    class="process-window shadow-2"
+    @mousedown="highlightCurrentWindow()"
+    :style="{ zIndex }"
+  >
     <q-bar class="bg-primary text-white process-window__bar">
       <q-img :src="process.application.icon" height="24px" width="24px" />
       <div class="process-window__bar__title">
@@ -14,7 +18,9 @@
 </template>
 
 <script lang="ts">
+import { computed } from '@vue/reactivity';
 import { Process } from 'src/models/processes/Process';
+import { useDesktop } from 'src/store/desktop';
 import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
@@ -24,6 +30,20 @@ export default defineComponent({
       type: Object as PropType<Process>,
       required: true,
     },
+  },
+  setup(props) {
+    const desktopStore = useDesktop();
+
+    const zIndex = computed(() =>
+      desktopStore.getters.windowZIndex(props.process.id)
+    );
+
+    return {
+      zIndex,
+      highlightCurrentWindow() {
+        desktopStore.mutations.setWindowOnEvidence(props.process.id);
+      },
+    };
   },
 });
 </script>

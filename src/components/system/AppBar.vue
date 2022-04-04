@@ -185,8 +185,10 @@ export default defineComponent({
       appOnBarIndexMenuVisible.value = undefined;
     };
 
-    const launchApp = (app: Application) => {
-      processesStore.mutations.addAppAsProcess(app);
+    const launchApp = async (app: Application) => {
+      const newProcessId: string =
+        await (processesStore.actions.addAppAsProcess(app) as Promise<string>);
+      desktopStore.mutations.setWindowOnEvidence(newProcessId);
     };
 
     return {
@@ -227,8 +229,8 @@ export default defineComponent({
         desktopStore.mutations.removeAppFromBarAtIndex(appBarItemIndex);
         resetAppOnBarIndexMenuVisible();
       },
-      onMenuAppClick(app: Application) {
-        launchApp(app);
+      async onMenuAppClick(app: Application) {
+        await launchApp(app);
         isMenuVisible.value = false;
       },
     };

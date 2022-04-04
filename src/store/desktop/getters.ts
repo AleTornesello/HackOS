@@ -9,4 +9,16 @@ export default class DesktopGetters extends Getters<DesktopState> {
   get appsOnBar() {
     return this.state.appsOnBar;
   }
+
+  get windowZIndexes() {
+    return this.state.windowZIndexes;
+  }
+
+  windowZIndex(processId: string): number {
+    return (
+      this.state.windowZIndexes.find(
+        (windowIndexData) => windowIndexData.processId === processId
+      )?.zIndex || 0
+    );
+  }
 }
