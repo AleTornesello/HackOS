@@ -5,7 +5,7 @@
     @dragover.prevent
     @dragenter.prevent
   >
-    <div class="col col-auto" :class="{ 'q-pr-xs': appsOnBar.length > 0 }">
+    <div class="col col-auto" :class="{ 'q-pr-xs': appsOnBarItems.length > 0 }">
       <q-btn
         push
         color="primary"
@@ -38,16 +38,24 @@
     </div>
     <div
       class="col-auto q-pl-xs"
-      v-for="(app, index) in appsOnBar"
-      :key="app.id"
+      v-for="(item, index) in appsOnBarItems"
+      :key="item.app.id"
     >
       <q-btn
         flat
-        @click="launchApp(app)"
         padding="sm"
+        class="app-on-bar"
+        @click="launchApp(item.app)"
         @mousedown="onAppBarItemMouseDown($event, index)"
       >
-        <q-img :src="app.icon" height="32px" width="32px" />
+        <q-img :src="item.app.icon" height="32px" width="32px" />
+        <div class="row app-on-bar__instances">
+          <div
+            class="col-auto app-on-bar__instances__item"
+            v-for="index in item.runningInstancesCount"
+            :key="`${item.app.id}_${index}`"
+          ></div>
+        </div>
 
         <q-menu
           :model-value="appOnBarIndexMenuVisible === index"
@@ -55,13 +63,29 @@
           anchor="top middle"
           self="bottom middle"
           :offset="[0, 10]"
+          class="app-on-bar__menu"
           @hide="resetAppOnBarIndexMenuVisible()"
         >
           <q-list dense style="min-width: 100px">
-            <q-item clickable v-close-popup @click="launchApp(app)">
-              <q-item-section> Launch {{ app.name }} </q-item-section>
+            <q-item-label
+              v-if="item.runningInstances.length > 0"
+              header
+              class="app-on-bar__menu__activities__title"
+            >
+              Activities
+            </q-item-label>
+            <q-item
+              v-for="process in item.runningInstances"
+              :key="process.id"
+              clickable
+              v-close-popup
+            >
+              <q-item-section> {{ process.application.name }} </q-item-section>
             </q-item>
-            <q-separator />
+            <q-separator v-if="item.runningInstances.length > 0" />
+            <q-item clickable v-close-popup @click="launchApp(item.app)">
+              <q-item-section> Launch {{ item.app.name }} </q-item-section>
+            </q-item>
             <q-item clickable @click="removeAppOnBarAtIndex(index)">
               <q-item-section>Remove from applications bar</q-item-section>
             </q-item>
@@ -74,10 +98,17 @@
 
 <script lang="ts">
 import { Application } from 'src/models/app/Application';
+import { Process } from 'src/models/processes/Process';
 import { useApps } from 'src/store/app';
 import { useDesktop } from 'src/store/desktop';
 import { useProcesses } from 'src/store/processes';
 import { computed, defineComponent, ref } from 'vue';
+
+interface AppOnBarItem {
+  app: Application;
+  runningInstancesCount: number;
+  runningInstances: Process[];
+}
 
 export default defineComponent({
   name: 'AppBar',
@@ -91,16 +122,60 @@ export default defineComponent({
       appsStore.getters.apps.filter((app) => !app.groupId)
     );
 
-    const appsOnBar = computed(
-      () =>
-        desktopStore.getters.appsOnBar
+    const appsOnBarItems = computed(() => {
+      let appsOnBarItems: AppOnBarItem[] = [];
+
+      // Add apps already on bar
+      appsOnBarItems.push(
+        ...(desktopStore.getters.appsOnBar
           .filter((appId) =>
             appsStore.getters.apps.find((app) => app.id === appId)
           )
-          .map((appId) =>
-            appsStore.getters.apps.find((app) => app.id === appId)
-          ) as Application[]
-    );
+          .map((appId) => ({
+            app: appsStore.getters.apps.find((app) => app.id === appId),
+            runningInstancesCount: Math.min(
+              processesStore.getters.runningAppInstances(appId).length,
+              3
+            ),
+            runningInstances: processesStore.getters.runningAppInstances(appId),
+          })) as AppOnBarItem[])
+      );
+
+      // Add running apps not on bar
+      const runningAppsMap: Map<string, AppOnBarItem> = new Map();
+
+      processesStore.getters.processes
+        // Remove the processes that are associated with an app
+        //       // already on bar
+        .filter(
+          (process) =>
+            !desktopStore.getters.appsOnBar.some(
+              (appId) => process.application.id === appId
+            )
+        )
+        .forEach((process) => {
+          if (process.application.id) {
+            if (runningAppsMap.has(process.application.id)) {
+              const appOnBarItem = runningAppsMap.get(process.application.id);
+
+              if (appOnBarItem) {
+                appOnBarItem.runningInstancesCount++;
+                appOnBarItem.runningInstances.push(process);
+              }
+            } else {
+              runningAppsMap.set(process.application.id, {
+                app: process.application,
+                runningInstancesCount: 1,
+                runningInstances: [process],
+              });
+            }
+          }
+        });
+
+      appsOnBarItems.push(...Array.from(runningAppsMap.values()));
+
+      return appsOnBarItems;
+    });
     const appOnBarIndexMenuVisible = ref<number | undefined>(undefined);
 
     const resetAppOnBarIndexMenuVisible = () => {
@@ -117,7 +192,7 @@ export default defineComponent({
         isMenuVisible.value = !isMenuVisible.value;
       },
       ungroupedApps,
-      appsOnBar,
+      appsOnBarItems,
       appOnBarIndexMenuVisible,
       onDragStart(event: DragEvent, app: Application) {
         if (event.dataTransfer && app.id) {
@@ -176,5 +251,29 @@ export default defineComponent({
   bottom: 60px;
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+.app-on-bar {
+  &__menu {
+    &__activities {
+      &__title {
+        padding: 8px 16px;
+      }
+    }
+  }
+
+  &__instances {
+    position: absolute;
+    bottom: 8px;
+    gap: 4px;
+
+    &__item {
+      width: 4px !important;
+      height: 4px !important;
+      border-radius: 4px;
+      background-color: #ffffff;
+      border: thin solid #888888;
+    }
+  }
 }
 </style>
