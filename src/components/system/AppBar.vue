@@ -146,7 +146,7 @@ export default defineComponent({
 
       processesStore.getters.processes
         // Remove the processes that are associated with an app
-        //       // already on bar
+        // already on bar
         .filter(
           (process) =>
             !desktopStore.getters.appsOnBar.some(
