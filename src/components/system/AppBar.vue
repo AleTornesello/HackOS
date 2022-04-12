@@ -80,21 +80,39 @@
               clickable
               v-close-popup
             >
-              <q-item-section> {{ process.application.name }} </q-item-section>
+              <div class="row items-center">
+                <q-icon
+                  :name="`img:${process.application.icon}`"
+                  size="xs"
+                  left
+                />
+                <q-item-section>
+                  {{ process.application.name }}
+                </q-item-section>
+              </div>
             </q-item>
             <q-separator v-if="item.runningInstances.length > 0" />
             <q-item clickable v-close-popup @click="launchApp(item.app)">
-              <q-item-section> Launch {{ item.app.name }} </q-item-section>
+              <div class="row items-center">
+                <q-icon :name="`img:${item.app.icon}`" size="xs" left />
+                <q-item-section> Launch {{ item.app.name }} </q-item-section>
+              </div>
             </q-item>
             <q-item
               v-if="item.canBeRemoved"
               clickable
               @click="removeAppOnBarAtIndex(index)"
             >
-              <q-item-section>Remove from applications bar</q-item-section>
+              <div class="row items-center">
+                <q-icon name="mdi-pin-off" size="xs" left />
+                <q-item-section>Remove from applications bar</q-item-section>
+              </div>
             </q-item>
             <q-item v-else clickable @click="addAppToBar(item.app.id)">
-              <q-item-section>Add application to bar</q-item-section>
+              <div class="row items-center">
+                <q-icon name="mdi-pin" size="xs" left />
+                <q-item-section>Add application to bar</q-item-section>
+              </div>
             </q-item>
           </q-list>
         </q-menu>
