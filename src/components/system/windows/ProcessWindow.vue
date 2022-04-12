@@ -12,7 +12,7 @@
       <q-space />
       <!-- <q-btn dense flat icon="minimize" />
       <q-btn dense flat icon="crop_square" /> -->
-      <q-btn dense flat icon="close" />
+      <q-btn dense flat icon="close" @click="stopProcess()" />
     </q-bar>
   </q-card>
 </template>
@@ -21,6 +21,7 @@
 import { computed } from '@vue/reactivity';
 import { Process } from 'src/models/processes/Process';
 import { useDesktop } from 'src/store/desktop';
+import { useProcesses } from 'src/store/processes';
 import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
@@ -33,6 +34,7 @@ export default defineComponent({
   },
   setup(props) {
     const desktopStore = useDesktop();
+    const processesStore = useProcesses();
 
     const zIndex = computed(() =>
       desktopStore.getters.windowZIndex(props.process.id)
@@ -42,6 +44,9 @@ export default defineComponent({
       zIndex,
       highlightCurrentWindow() {
         desktopStore.mutations.setWindowOnEvidence(props.process.id);
+      },
+      stopProcess() {
+        processesStore.mutations.stopProcess(props.process.id);
       },
     };
   },

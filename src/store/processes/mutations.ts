@@ -9,4 +9,11 @@ export default class ProcessesMutations extends Mutations<ProcessesState> {
       new Process({ id: data.id, application: data.app })
     );
   }
+
+  public stopProcess(id: string) {
+    const processIndex = this.state.processes.findIndex((p) => p.id === id);
+    if (processIndex > -1) {
+      this.state.processes.splice(processIndex, 1);
+    }
+  }
 }
