@@ -1,3 +1,5 @@
+import { Position } from 'src/models/common/Position';
+import { Size } from 'src/models/common/Size';
 import { Mutations } from 'vuex-smart-module';
 import DesktopState from './state';
 
@@ -42,6 +44,44 @@ export default class DesktopMutations extends Mutations<DesktopState> {
           }
         });
       }
+    }
+  }
+
+  public setWindowPosition(data: { appId: string; newPosition: Position }) {
+    const app = this.state.lastAppWindowsGeometry.find(
+      (item) => item.appId === data.appId
+    );
+
+    if (app) {
+      app.position = data.newPosition;
+    } else {
+      this.state.lastAppWindowsGeometry.push({
+        appId: data.appId,
+        position: data.newPosition,
+        size: {
+          height: 0,
+          width: 0,
+        },
+      });
+    }
+  }
+
+  public setWindowSize(data: { appId: string; newSize: Size }) {
+    const app = this.state.lastAppWindowsGeometry.find(
+      (item) => item.appId === data.appId
+    );
+
+    if (app) {
+      app.size = data.newSize;
+    } else {
+      this.state.lastAppWindowsGeometry.push({
+        appId: data.appId,
+        position: {
+          x: 0,
+          y: 0,
+        },
+        size: data.newSize,
+      });
     }
   }
 }

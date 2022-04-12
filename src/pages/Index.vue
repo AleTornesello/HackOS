@@ -86,8 +86,8 @@ export default defineComponent({
 
   .process-window {
     position: absolute;
-    min-width: 200px;
-    min-height: 150px;
+    min-width: 300px;
+    min-height: 200px;
   }
 }
 </style>
