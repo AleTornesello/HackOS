@@ -96,5 +96,7 @@ export default defineComponent({
   right: 0;
   bottom: 0;
   overflow: hidden;
+  background: none !important;
+  pointer-events: none;
 }
 </style>

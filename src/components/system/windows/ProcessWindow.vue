@@ -50,6 +50,8 @@ export default defineComponent({
 
 <style lang="scss">
 .process-window {
+  pointer-events: all;
+
   &__bar {
     border-radius: 4px 4px 0 0 !important;
 

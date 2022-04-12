@@ -11,7 +11,7 @@
         :key="app.id"
         class="col-auto"
       >
-        <q-btn flat no-caps>
+        <q-btn flat no-caps @click="launchApp(app)">
           <div class="column items-center">
             <q-img :src="app.icon" height="48px" width="48px" />
             <div class="text-weight-light">{{ app.name }}</div>
@@ -30,6 +30,7 @@ import { useDesktop } from 'src/store/desktop';
 import { useApps } from 'src/store/app';
 import { Application } from 'src/models/app/Application';
 import WindowsManger from 'src/components/system/windows/WindowsManger.vue';
+import { useProcesses } from 'src/store/processes';
 
 export default defineComponent({
   name: 'Desktop',
@@ -37,6 +38,7 @@ export default defineComponent({
   setup() {
     const desktopStore = useDesktop();
     const appsStore = useApps();
+    const processesStore = useProcesses();
 
     const appIdsOnDesktop = computed(() => desktopStore.getters.apps);
     const appsOnDesktop = computed(
@@ -45,8 +47,16 @@ export default defineComponent({
           appsStore.getters.apps.find((app) => app.id === appId)
         ) as Application[]
     );
+
+    const launchApp = async (app: Application) => {
+      const newProcessId: string =
+        await (processesStore.actions.addAppAsProcess(app) as Promise<string>);
+      desktopStore.mutations.setWindowOnEvidence(newProcessId);
+    };
+
     return {
       appsOnDesktop,
+      launchApp,
     };
   },
   created() {
