@@ -86,8 +86,15 @@
             <q-item clickable v-close-popup @click="launchApp(item.app)">
               <q-item-section> Launch {{ item.app.name }} </q-item-section>
             </q-item>
-            <q-item clickable @click="removeAppOnBarAtIndex(index)">
+            <q-item
+              v-if="item.canBeRemoved"
+              clickable
+              @click="removeAppOnBarAtIndex(index)"
+            >
               <q-item-section>Remove from applications bar</q-item-section>
+            </q-item>
+            <q-item v-else clickable @click="addAppToBar(item.app.id)">
+              <q-item-section>Add application to bar</q-item-section>
             </q-item>
           </q-list>
         </q-menu>
@@ -106,6 +113,7 @@ import { computed, defineComponent, ref } from 'vue';
 
 interface AppOnBarItem {
   app: Application;
+  canBeRemoved: boolean;
   runningInstancesCount: number;
   runningInstances: Process[];
 }
@@ -133,6 +141,7 @@ export default defineComponent({
           )
           .map((appId) => ({
             app: appsStore.getters.apps.find((app) => app.id === appId),
+            canBeRemoved: true,
             runningInstancesCount: Math.min(
               processesStore.getters.runningAppInstances(appId).length,
               3
@@ -168,6 +177,7 @@ export default defineComponent({
             } else {
               runningAppsMap.set(process.application.id, {
                 app: process.application,
+                canBeRemoved: false,
                 runningInstancesCount: 1,
                 runningInstances: [process],
               });
@@ -191,6 +201,13 @@ export default defineComponent({
       desktopStore.mutations.setWindowOnEvidence(newProcessId);
     };
 
+    const addAppToBar = (appId: string) => {
+      if (!desktopStore.getters.appsOnBar.includes(appId)) {
+        desktopStore.mutations.addAppToBar(appId);
+        resetAppOnBarIndexMenuVisible();
+      }
+    };
+
     return {
       isMenuVisible,
       toggleMenu() {
@@ -209,12 +226,10 @@ export default defineComponent({
       onDrop(event: DragEvent) {
         if (event.dataTransfer) {
           const appId = event.dataTransfer.getData('appId');
-
-          if (!desktopStore.getters.appsOnBar.includes(appId)) {
-            desktopStore.mutations.addAppToBar(appId);
-          }
+          addAppToBar(appId);
         }
       },
+      addAppToBar,
       launchApp,
       onAppBarItemMouseDown(event: MouseEvent, appBarItemIndex: number) {
         if (event.button === 2) {
