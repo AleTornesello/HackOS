@@ -16,6 +16,17 @@
             <q-img :src="app.icon" height="48px" width="48px" />
             <div class="text-weight-light">{{ app.name }}</div>
           </div>
+
+          <q-menu touch-position context-menu>
+            <q-list dense>
+              <q-item clickable v-close-popup @click="launchApp(app)">
+                <div class="row items-center">
+                  <q-icon :name="`img:${app.icon}`" size="xs" left />
+                  <q-item-section>Launch {{ app.name }}</q-item-section>
+                </div>
+              </q-item>
+            </q-list>
+          </q-menu>
         </q-btn>
       </div>
     </div>
