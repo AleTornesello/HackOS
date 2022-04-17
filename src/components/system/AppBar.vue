@@ -80,39 +80,48 @@
               clickable
               v-close-popup
             >
-              <div class="row items-center">
+              <q-item-section side>
                 <q-icon
                   :name="`img:${process.application.icon}`"
                   size="xs"
                   left
                 />
-                <q-item-section>
-                  {{ process.application.name }}
-                </q-item-section>
-              </div>
+              </q-item-section>
+              <q-item-section>
+                {{ process.application.name }}
+              </q-item-section>
+              <q-item-section side>
+                <q-btn
+                  flat
+                  icon="close"
+                  size="xs"
+                  padding="xs"
+                  @click="stopProcess(process.id)"
+                ></q-btn>
+              </q-item-section>
             </q-item>
             <q-separator v-if="item.runningInstances.length > 0" />
             <q-item clickable v-close-popup @click="launchApp(item.app)">
-              <div class="row items-center">
+              <q-item-section side>
                 <q-icon :name="`img:${item.app.icon}`" size="xs" left />
-                <q-item-section> Launch {{ item.app.name }} </q-item-section>
-              </div>
+              </q-item-section>
+              <q-item-section> Launch {{ item.app.name }} </q-item-section>
             </q-item>
             <q-item
               v-if="item.canBeRemoved"
               clickable
               @click="removeAppOnBarAtIndex(index)"
             >
-              <div class="row items-center">
+              <q-item-section side>
                 <q-icon name="mdi-pin-off" size="xs" left />
-                <q-item-section>Remove from applications bar</q-item-section>
-              </div>
+              </q-item-section>
+              <q-item-section>Remove from applications bar</q-item-section>
             </q-item>
             <q-item v-else clickable @click="addAppToBar(item.app.id)">
-              <div class="row items-center">
+              <q-item-section side>
                 <q-icon name="mdi-pin" size="xs" left />
-                <q-item-section>Add application to bar</q-item-section>
-              </div>
+              </q-item-section>
+              <q-item-section>Add application to bar</q-item-section>
             </q-item>
           </q-list>
         </q-menu>
@@ -265,6 +274,9 @@ export default defineComponent({
       async onMenuAppClick(app: Application) {
         await launchApp(app);
         isMenuVisible.value = false;
+      },
+      stopProcess(processId: string) {
+        processesStore.mutations.stopProcess(processId);
       },
     };
   },
