@@ -47,12 +47,12 @@ export default defineComponent({
     const windows = ref<WindowItem[]>([]);
 
     const lastAppWindowPositionByAppId = (appId: string): Position => {
-      const position: Position | undefined =
-        desktopStore.getters.lastAppWindowPositionByAppId(appId);
-      return {
-        x: position ? position.x : 0,
-        y: position ? position.y : 0,
-      };
+      return (
+        desktopStore.getters.lastAppWindowPositionByAppId(appId) || {
+          x: 0,
+          y: 0,
+        }
+      );
     };
 
     const lastAppWindowSizeByAppId = (appId: string): Size => {
@@ -128,8 +128,10 @@ export default defineComponent({
         );
 
         if (processWindow) {
-          processWindow.position.x = x;
-          processWindow.position.y = y;
+          processWindow.position = {
+            x,
+            y,
+          };
         }
 
         desktopStore.mutations.setWindowPosition({
@@ -155,10 +157,14 @@ export default defineComponent({
         );
 
         if (processWindow) {
-          processWindow.position.x = x;
-          processWindow.position.y = y;
-          processWindow.size.width = event.rect.width;
-          processWindow.size.height = event.rect.height;
+          processWindow.position = {
+            x,
+            y,
+          };
+          processWindow.size = {
+            width: event.rect.width,
+            height: event.rect.height,
+          };
         }
 
         desktopStore.mutations.setWindowPosition({
